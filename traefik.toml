@@ -1,0 +1,17 @@
+defaultEntryPoints = ["http"]
+
+[log]
+level = "DEBUG"
+
+[accessLog]
+
+[providers.docker]
+
+[providers.file]
+filename = "traefik.toml"
+directory = "/etc/traefik/"
+watch = true
+
+[entryPoints]
+  [entryPoints.web]
+  address = ":10000"

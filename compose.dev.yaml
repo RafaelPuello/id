@@ -1,4 +1,4 @@
-name: digidex
+name: identification-service
 
 services:
   backend:
@@ -9,9 +9,9 @@ services:
     volumes:
       - ./backend:/home/web/code
 
-  auth-frontend:
+  frontend:
     build:
-      context: ./auth/frontend/
+      context: ./frontend/
       dockerfile: Dockerfile
       target: dev
     environment:
@@ -19,26 +19,9 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./auth/frontend/src:/app/src
-      - ./auth/frontend/public:/app/public
-      - ./auth/frontend/index.html:/app/index.html
-
-  app-frontend:
-    build:
-      context: ./app/frontend/
-      dockerfile: Dockerfile
-      target: dev
-    environment:
-      - WATCHPACK_POLLING=true
-      - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=100
-      - NEXT_TELEMETRY_DISABLED=1
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./app/frontend:/app
-      - /app/node_modules
-      - /app/.next
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
 
   proxy:
     command:
