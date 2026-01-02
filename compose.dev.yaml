@@ -1,0 +1,45 @@
+name: digidex
+
+services:
+  backend:
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./backend:/home/web/code
+
+  auth-frontend:
+    build:
+      context: ./auth/frontend/
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      - WATCHPACK_POLLING=true
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./auth/frontend/src:/app/src
+      - ./auth/frontend/public:/app/public
+      - ./auth/frontend/index.html:/app/index.html
+
+  app-frontend:
+    build:
+      context: ./app/frontend/
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=100
+      - NEXT_TELEMETRY_DISABLED=1
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app/frontend:/app
+      - /app/node_modules
+      - /app/.next
+
+  proxy:
+    command:
+      - "--api.insecure=True"
