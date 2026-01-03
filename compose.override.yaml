@@ -6,10 +6,9 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
       target: dev
-    ports:
-      - "8000:8000"
     labels:
       - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.routers.backend.tls=false"
     env_file:
       - ./backend/.env
     volumes:
@@ -24,6 +23,8 @@ services:
       - "5173:5173"
     labels:
       - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.tls=false"
+      - "traefik.http.services.frontend.loadbalancer.server.port=5173"
     env_file:
       - ./frontend/.env
     environment:
@@ -35,7 +36,7 @@ services:
 
   proxy:
     ports:
-      - "10000:80"
+      - "10000:10000"
     command:
       - "--api.insecure=True"
       - "--entrypoints.web.address=:10000"
