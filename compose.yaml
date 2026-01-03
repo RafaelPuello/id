@@ -7,14 +7,12 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
       target: prod
-    ports:
-      - "8000:8000"
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      # - "traefik.http.routers.backend.rule=PathPrefix(`/`)"
       - "traefik.http.routers.backend.rule=PathPrefix(`/accounts`) || PathPrefix(`/_allauth`) || PathPrefix(`/api`)"
-      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.priority=1000"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
 
@@ -24,16 +22,14 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
       target: prod
-    ports:
-      - "8080:8080"
     restart: unless-stopped
     depends_on:
       - backend
     labels:
       - "traefik.enable=true"
-      #  - "traefik.http.routers.frontend.rule=Host(`auth.digidex.bio`)"
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
       - "traefik.http.routers.frontend.priority=10"
       - "traefik.http.services.frontend.loadbalancer.server.port=5173"
 
@@ -41,7 +37,8 @@ services:
     container_name: proxy
     image: traefik:v3.6
     ports:
-      - "10000:10000"
+      - "80:80"
+      - "443:443"
     volumes:
       - ./traefik.toml:/etc/traefik/traefik.toml:ro
       - /var/run/docker.sock:/var/run/docker.sock
@@ -49,7 +46,8 @@ services:
       - "--api.dashboard=True"
       - "--api.insecure=False"
       - "--providers.docker=true"
-      - "--entrypoints.web.address=:10000"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
     restart: unless-stopped
 
   mail:

@@ -6,6 +6,10 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
       target: dev
+    ports:
+      - "8000:8000"
+    labels:
+      - "traefik.http.routers.backend.entrypoints=web"
     env_file:
       - ./backend/.env
     volumes:
@@ -16,17 +20,22 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
       target: dev
+    ports:
+      - "5173:5173"
+    labels:
+      - "traefik.http.routers.frontend.entrypoints=web"
     env_file:
       - ./frontend/.env
     environment:
       - WATCHPACK_POLLING=true
-    ports:
-      - "5173:5173"
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
       - ./frontend/index.html:/app/index.html
 
   proxy:
+    ports:
+      - "10000:80"
     command:
       - "--api.insecure=True"
+      - "--entrypoints.web.address=:10000"
