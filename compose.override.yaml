@@ -10,7 +10,7 @@ services:
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.routers.backend.tls=false"
     env_file:
-      - ./backend/.env
+      - ./backend/.env.dev
     volumes:
       - ./backend:/home/web/code
 
