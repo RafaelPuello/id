@@ -1,6 +1,6 @@
 [submodule "backend"]
 	path = backend
-	url = git@github.com:RafaelPuello/id-backend.git
+	url = https://github.com/RafaelPuello/id-backend.git
 [submodule "frontend"]
 	path = frontend
-	url = git@github.com:RafaelPuello/id-frontend.git
+	url = https://github.com/RafaelPuello/id-frontend.git
