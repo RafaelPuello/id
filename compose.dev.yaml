@@ -6,6 +6,8 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
       target: dev
+    env_file:
+      - ./backend/.env
     volumes:
       - ./backend:/home/web/code
 
@@ -14,6 +16,8 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
       target: dev
+    env_file:
+      - ./frontend/.env
     environment:
       - WATCHPACK_POLLING=true
     ports:

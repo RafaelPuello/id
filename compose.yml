@@ -7,8 +7,6 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
       target: prod
-    env_file:
-      - ./backend/.env
     ports:
       - "8000:8000"
     restart: unless-stopped
@@ -26,8 +24,6 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
       target: prod
-    env_file:
-      - ./frontend/.env
     ports:
       - "8080:8080"
     restart: unless-stopped
