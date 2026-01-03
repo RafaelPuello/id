@@ -27,8 +27,6 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
-    ports:
-      - "8080:8080"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
