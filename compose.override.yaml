@@ -31,6 +31,13 @@ services:
       - ./frontend:/app
       - /app/node_modules
 
+  mail:
+    container_name: mail
+    image: schickling/mailcatcher
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
   proxy:
     ports:
       - "10000:10000"

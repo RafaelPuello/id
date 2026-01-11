@@ -51,10 +51,3 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
     restart: unless-stopped
-
-  mail:
-    container_name: mail
-    image: schickling/mailcatcher
-    ports:
-      - "1080:1080"
-      - "1025:1025"
