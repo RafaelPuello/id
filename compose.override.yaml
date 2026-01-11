@@ -7,6 +7,7 @@ services:
       dockerfile: Dockerfile
       target: dev
     labels:
+      - "traefik.http.routers.backend.rule=PathPrefix(`/admin`) || PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.routers.backend.tls=false"
     env_file:
@@ -44,3 +45,4 @@ services:
     command:
       - "--api.insecure=True"
       - "--entrypoints.web.address=:10000"
+  
