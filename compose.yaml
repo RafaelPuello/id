@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
       target: prod
     restart: unless-stopped
+    networks:
+      - web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`id.digidex.bio`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
@@ -25,6 +27,8 @@ services:
       dockerfile: Dockerfile
       target: prod
     restart: unless-stopped
+    networks:
+      - web
     depends_on:
       - backend
     labels:
@@ -35,19 +39,6 @@ services:
       - "traefik.http.routers.frontend.priority=10"
       - "traefik.http.services.frontend.loadbalancer.server.port=8080"
 
-  proxy:
-    container_name: proxy
-    image: traefik:v3.6
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./traefik.toml:/etc/traefik/traefik.toml:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command:
-      - "--api.dashboard=True"
-      - "--api.insecure=False"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-    restart: unless-stopped
+networks:
+  web:
+    external: true
