@@ -6,13 +6,10 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
       target: dev
-    ports:
-      - "8001:8001"
     labels:
       - "traefik.http.routers.backend.rule=PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.routers.backend.tls=false"
-      - "traefik.http.services.backend.loadbalancer.server.port=8001"
     env_file:
       - ./backend/.env.dev
     volumes:
@@ -23,13 +20,10 @@ services:
       context: ../
       dockerfile: id/frontend/Dockerfile
       target: dev
-    ports:
-      - "3001:3001"
     labels:
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.routers.frontend.tls=false"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3001"
     env_file:
       - ./frontend/.env
     environment:

@@ -29,7 +29,7 @@ services:
       dockerfile: id/frontend/Dockerfile
       target: prod
     ports:
-      - "3001:3001"
+      - "5173:5173"
     restart: unless-stopped
     networks:
       - web
@@ -41,7 +41,7 @@ services:
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls=true"
       - "traefik.http.routers.frontend.priority=10"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3001"
+      - "traefik.http.services.frontend.loadbalancer.server.port=5173"
 
 networks:
   web:
