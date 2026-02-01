@@ -17,8 +17,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend/
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: id/frontend/Dockerfile
       target: dev
     labels:
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
@@ -32,6 +32,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - ../shared/styles:/app/src/styles:ro
 
   mail:
     container_name: mail

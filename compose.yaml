@@ -23,8 +23,8 @@ services:
   frontend:
     container_name: frontend
     build:
-      context: ./frontend/
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: id/frontend/Dockerfile
       target: prod
     restart: unless-stopped
     networks:
