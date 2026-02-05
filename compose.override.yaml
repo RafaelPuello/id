@@ -7,6 +7,7 @@ services:
       dockerfile: Dockerfile
       target: dev
     labels:
+      #- "traefik.http.routers.backend.rule=Host(`id.digidex.local`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
       - "traefik.http.routers.backend.rule=PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.routers.backend.tls=false"
@@ -21,6 +22,7 @@ services:
       dockerfile: id/frontend/Dockerfile
       target: dev
     labels:
+      #- "traefik.http.routers.frontend.rule=Host(`id.digidex.local`)"
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.routers.frontend.tls=false"
@@ -32,10 +34,3 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - ../shared/styles:/app/src/styles:ro
-
-  #mail:
-    #container_name: mail
-    #image: schickling/mailcatcher
-    #ports:
-      #- "1080:1080"
-      #- "1025:1025"
