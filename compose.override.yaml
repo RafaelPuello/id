@@ -1,31 +1,31 @@
 name: identification-service
 
 services:
-  backend:
+  id-backend:
     build:
       context: ./backend/
       dockerfile: Dockerfile
       target: dev
     labels:
-      #- "traefik.http.routers.backend.rule=Host(`id.digidex.local`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
-      - "traefik.http.routers.backend.rule=PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`)"
-      - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.routers.backend.tls=false"
+      #- "traefik.http.routers.id-backend.rule=Host(`id.digidex.local`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
+      - "traefik.http.routers.id-backend.rule=PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`)"
+      - "traefik.http.routers.id-backend.entrypoints=web"
+      - "traefik.http.routers.id-backend.tls=false"
     env_file:
       - ./backend/.env.dev
     volumes:
       - ./backend:/home/web/code
 
-  frontend:
+  id-frontend:
     build:
       context: ../
       dockerfile: id/frontend/Dockerfile
       target: dev
     labels:
-      #- "traefik.http.routers.frontend.rule=Host(`id.digidex.local`)"
-      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.routers.frontend.tls=false"
+      #- "traefik.http.routers.id-frontend.rule=Host(`id.digidex.local`)"
+      - "traefik.http.routers.id-frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.id-frontend.entrypoints=web"
+      - "traefik.http.routers.id-frontend.tls=false"
     env_file:
       - ./frontend/.env
     environment:
