@@ -11,7 +11,7 @@ services:
       - "8001:8001"
     restart: unless-stopped
     networks:
-      - web
+      - digidex-net
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.id-backend.rule=Host(`id.digidex.bio`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
@@ -32,7 +32,7 @@ services:
       - "5173:5173"
     restart: unless-stopped
     networks:
-      - web
+      - digidex-net
     depends_on:
       - id-backend
     labels:
@@ -44,5 +44,5 @@ services:
       - "traefik.http.services.id-frontend.loadbalancer.server.port=5173"
 
 networks:
-  web:
+  digidex-net:
     external: true
