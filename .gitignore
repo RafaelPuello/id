@@ -1,3 +1,4 @@
+*.pem
 compose.override*
 
 # Byte-compiled / optimized / DLL files
