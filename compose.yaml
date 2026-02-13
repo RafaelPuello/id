@@ -18,7 +18,7 @@ services:
         gid: "1000"
         mode: 0400    # owner read-only  
     environment:
-      - JWT_PRIVATE_KEY_FILE=/run/secrets/jwt_private_key
+      - JWT_PRIVATE_KEY=/run/secrets/jwt_private_key
     networks:
       - digidex-net
     labels:
