@@ -50,6 +50,10 @@ Development includes a mailcatcher service at `localhost:1080` for email testing
 **Key Configuration (`backend/config/settings.py`):**
 - Custom User model with email as identifier (no username)
 - `HEADLESS_ONLY = True` - No server-rendered auth pages
+- **JWT-only authentication** - SessionMiddleware removed, no sessions created
+  - `SESSION_ENGINE = 'django.contrib.sessions.backends.base.SessionStore'` (no-op backend)
+  - No session cookies sent/received
+  - All auth via JWT tokens in Authorization header
 - MFA types: TOTP, recovery codes, WebAuthn
 - Passkey login enabled, passkey signup disabled
 - Signups currently disabled (`IdentityAdapter.is_open_for_signup` returns False)
