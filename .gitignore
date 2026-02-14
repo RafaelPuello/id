@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Playwright
+playwright-report/
+test-results/
+.auth/
+artifacts/
