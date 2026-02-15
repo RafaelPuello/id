@@ -1,6 +1,10 @@
-# CLAUDE.md
+# CLAUDE.md - DigiDex ID Service
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+**Service-specific guides:**
+- **Backend**: See `/id/backend/CLAUDE.md` for detailed Django backend architecture, JWT setup, testing, and API details
+- **Frontend**: See `/id/frontend/CLAUDE.md` for React/Vite frontend architecture and component details
+
+This file provides overall service context.
 
 ## Project Overview
 
@@ -47,65 +51,11 @@ docker compose -f compose.yaml up
 
 Development includes a mailcatcher service at `localhost:1080` for email testing.
 
-## Architecture
+## Architecture Overview
 
-### Backend (Django 6.0)
+**Backend**: Django 6.0 with django-allauth headless API, JWT-based authentication (RS256), custom email-based User model, MFA support (TOTP/WebAuthn/recovery codes). See `/id/backend/CLAUDE.md` for detailed configuration, API endpoints, and authentication flow.
 
-**URL Structure:**
-- `/api/` - Ninja JWT API (token endpoints)
-- `/accounts/` - django-allauth standard URLs
-- `/_allauth/browser/v1/*` - Headless allauth API (used by frontend)
-
-**Key Configuration (`backend/config/settings.py`):**
-- Custom User model with email as identifier (no username)
-- `HEADLESS_ONLY = True` - No server-rendered auth pages
-- **JWT-only authentication** - SessionMiddleware removed, no sessions created
-  - `SESSION_ENGINE = 'django.contrib.sessions.backends.base.SessionStore'` (no-op backend)
-  - No session cookies sent/received
-  - All auth via JWT tokens in Authorization header
-- MFA types: TOTP, recovery codes, WebAuthn
-- Passkey login enabled, passkey signup disabled
-- Signups currently disabled (`IdentityAdapter.is_open_for_signup` returns False)
-
-**Apps:**
-- `identity/` - Custom User model and account adapter
-
-### Frontend (React 19 + Vite 7)
-
-**Authentication Flow:**
-- `AuthContext` (`/src/auth/AuthContext.jsx`) - Central auth state provider, fetches initial state on mount
-- Custom hooks (`/src/auth/hooks.jsx`) - `useAuth()`, `useConfig()`, `useUser()`, `useAuthStatus()`
-- `allauth` API client (`/src/lib/allauth.jsx`) - All backend communication
-- Auth changes broadcast via `allauth.auth.change` custom events
-
-**Route Guards:**
-- `<AuthenticatedRoute>` - Protects authenticated-only pages
-- `<AnonymousRoute>` - Protects anonymous-only pages (login, signup)
-- `<AuthChangeRedirector>` - Handles auth state transitions
-
-**Feature Directories:**
-```
-src/
-├── account/        # Login, signup, password, email management
-├── auth/           # Auth context, hooks, route guards
-├── mfa/            # TOTP, WebAuthn, Recovery Codes
-├── socialaccount/  # OAuth providers
-├── usersessions/   # Active session management
-├── components/     # Reusable components (forms/, layout/, nav/)
-├── lib/            # allauth API, CSRF handling, utilities
-```
-
-**Key Patterns:**
-- CSRF tokens sent via `X-CSRFToken` header (`/src/lib/django.jsx`)
-- Path alias: `@` resolves to `/src`
-- Runtime config fetched from backend (`/_allauth/browser/v1/config`), access via `useConfig()`
-- TypeScript migration in progress: form components use `.tsx`, feature components use `.jsx`
-
-**Auth Flow Constants (`/src/lib/allauth.jsx`):**
-- `Flows.LOGIN`, `Flows.SIGNUP`, `Flows.VERIFY_EMAIL`
-- `Flows.MFA_AUTHENTICATE`, `Flows.MFA_REAUTHENTICATE`
-- `Flows.LOGIN_BY_CODE`, `Flows.PASSWORD_RESET_BY_CODE`
-- `Flows.PROVIDER_SIGNUP`
+**Frontend**: React 19 + Vite 7 SPA with AuthContext for state management, React Router v7 for routing, and direct integration with headless allauth API. See `/id/frontend/CLAUDE.md` for component organization, route guards, and auth hooks.
 
 ## Backend Integration
 
