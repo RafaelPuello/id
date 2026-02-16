@@ -51,14 +51,12 @@ services:
       - id-backend
     labels:
       - "traefik.enable=true"
-
-      - "traefik.http.routers.id-frontend.rule=Host(`id.digidex.bio`)"
+      - "traefik.http.routers.id-frontend.rule=Host(`id.digidex.bio`) || Host(`www.id.digidex.bio`)"
       - "traefik.http.routers.id-frontend.entrypoints=websecure"
       - "traefik.http.routers.id-frontend.tls=true"
       - "traefik.http.routers.id-frontend.tls.certresolver=le"
-      - "traefik.http.routers.id-frontend.rule=Host(`id.digidex.bio`) || Host(`www.id.digidex.bio`)"
       - "traefik.http.routers.id-frontend.priority=10"
-      - "traefik.http.services.id-frontend.loadbalancer.server.port=5173"
+      - "traefik.http.services.id-frontend.loadbalancer.server.port=8080"
 
 networks:
   digidex-net:
