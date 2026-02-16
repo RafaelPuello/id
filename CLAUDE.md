@@ -80,7 +80,7 @@ python manage.py runserver 0.0.0.0:8000
 ```
 
 ### Frontend
-- Runtime config fetched from backend (`/_allauth/browser/v1/config`), not build-time env vars
+- Runtime config fetched from backend (`/_allauth/app/v1/config`), not build-time env vars
 - Frontend expects backend at same origin (via Traefik reverse proxy in development)
 - `.env` file optional; most config comes from backend at runtime
 
