@@ -1,0 +1,43 @@
+name: identification-service
+
+services:
+  id-backend:
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - "8001:8001"
+    labels:
+      #- "traefik.http.routers.id-backend.rule=Host(`id.digidex.local`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
+      - "traefik.http.routers.id-backend.rule=PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`)"
+      - "traefik.http.routers.id-backend.entrypoints=web"
+      - "traefik.http.routers.id-backend.tls=false"
+    env_file:
+      - ./backend/.env.dev
+    environment:
+      - JWT_PRIVATE_KEY_PATH=/home/web/code/config/keys/jwt_private_key.pem
+      - JWT_PUBLIC_KEY_PATH=/home/web/code/config/keys/jwt_public_key.pem
+    volumes:
+      - ./backend:/home/web/code
+
+  id-frontend:
+    build:
+      context: ../
+      dockerfile: id/frontend/Dockerfile
+      target: dev
+    ports:
+      - "5173:5173"
+    labels:
+      #- "traefik.http.routers.id-frontend.rule=Host(`id.digidex.local`)"
+      - "traefik.http.routers.id-frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.id-frontend.entrypoints=web"
+      - "traefik.http.routers.id-frontend.tls=false"
+    env_file:
+      - ./frontend/.env
+    environment:
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - ../shared/styles:/app/src/styles:ro

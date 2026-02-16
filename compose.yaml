@@ -3,6 +3,8 @@ name: identification-service
 secrets:
   jwt_private_key:
     file: ../secrets/private_key.pem
+  jwt_public_key:
+    file: ../secrets/public_key.pem
 
 services:
   id-backend:
@@ -16,9 +18,14 @@ services:
       - source: jwt_private_key
         uid: "1000"   # web user's UID
         gid: "1000"
-        mode: 0400    # owner read-only  
+        mode: 0400    # owner read-only
+      - source: jwt_public_key
+        uid: "1000"
+        gid: "1000"
+        mode: 0444    # owner read, others read
     environment:
-      - JWT_PRIVATE_KEY=/run/secrets/jwt_private_key
+      - JWT_PRIVATE_KEY_PATH=/run/secrets/jwt_private_key
+      - JWT_PUBLIC_KEY_PATH=/run/secrets/jwt_public_key
     networks:
       - digidex-net
     labels:
