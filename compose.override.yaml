@@ -33,6 +33,8 @@ services:
       - "traefik.http.routers.id-frontend.rule=PathPrefix(`/`)"
       - "traefik.http.routers.id-frontend.entrypoints=web"
       - "traefik.http.routers.id-frontend.tls=false"
+      - "traefik.http.routers.id-frontend.tls.certresolver="
+      - "traefik.http.services.id-frontend.loadbalancer.server.port=5173"
     env_file:
       - ./frontend/.env
     environment:
