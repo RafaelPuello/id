@@ -63,6 +63,10 @@ The frontend uses relative paths and expects to run behind a reverse proxy (Trae
 - `/api`, `/accounts`, `/_allauth` → backend:8000
 - All other paths → frontend:5173
 
+## Architectural Direction: Pure JWT
+
+The ID service is moving towards pure stateless JWT authentication with **no Django sessions**. The current database-backed session engine is a necessary interim solution (required by django-allauth's refresh token validation). Future auth work should aim to eliminate sessions entirely. The frontend is already designed as a pure JWT client and requires no changes for this migration. See `/id/backend/CLAUDE.md` for details on the blocker and potential paths forward.
+
 ## Environment Setup
 
 ### Backend
