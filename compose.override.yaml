@@ -9,8 +9,7 @@ services:
     ports:
       - "8001:8001"
     labels:
-      #- "traefik.http.routers.id-backend.rule=Host(`id.digidex.local`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
-      - "traefik.http.routers.id-backend.rule=PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`)"
+      - "traefik.http.routers.id-backend.rule=Host(`10.0.0.218`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
       - "traefik.http.routers.id-backend.entrypoints=web"
       - "traefik.http.routers.id-backend.tls=false"
     env_file:
@@ -29,11 +28,9 @@ services:
     ports:
       - "5173:5173"
     labels:
-      #- "traefik.http.routers.id-frontend.rule=Host(`id.digidex.local`)"
-      - "traefik.http.routers.id-frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.id-frontend.rule=Host(`10.0.0.218`) && PathPrefix(`/id`)"
       - "traefik.http.routers.id-frontend.entrypoints=web"
       - "traefik.http.routers.id-frontend.tls=false"
-      - "traefik.http.routers.id-frontend.tls.certresolver="
       - "traefik.http.services.id-frontend.loadbalancer.server.port=5173"
     env_file:
       - ./frontend/.env

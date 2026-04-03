@@ -30,7 +30,7 @@ services:
       - digidex-net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.id-backend.rule=Host(`id.digidex.bio`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
+      - "traefik.http.routers.id-backend.rule=Host(`digidex.bio`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
       - "traefik.http.routers.id-backend.entrypoints=websecure"
       - "traefik.http.routers.id-backend.tls=true"
       - "traefik.http.routers.id-backend.priority=1000"
@@ -51,7 +51,7 @@ services:
       - id-backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.id-frontend.rule=Host(`id.digidex.bio`) || Host(`www.id.digidex.bio`)"
+      - "traefik.http.routers.id-frontend.rule=Host(`digidex.bio`) && PathPrefix(`/id`)"
       - "traefik.http.routers.id-frontend.entrypoints=websecure"
       - "traefik.http.routers.id-frontend.tls=true"
       - "traefik.http.routers.id-frontend.tls.certresolver=le"
