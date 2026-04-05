@@ -28,9 +28,11 @@ services:
     ports:
       - "5173:5173"
     labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.id-frontend.rule=Host(`10.0.0.218`) && PathPrefix(`/id`)"
       - "traefik.http.routers.id-frontend.entrypoints=web"
       - "traefik.http.routers.id-frontend.tls=false"
+      - "traefik.http.routers.id-frontend.priority=10"
       - "traefik.http.services.id-frontend.loadbalancer.server.port=5173"
     env_file:
       - ./frontend/.env

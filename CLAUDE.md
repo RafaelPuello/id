@@ -60,8 +60,16 @@ Development includes a mailcatcher service at `localhost:1080` for email testing
 ## Backend Integration
 
 The frontend uses relative paths and expects to run behind a reverse proxy (Traefik) with the backend at the same origin. In development, Traefik routes:
-- `/api`, `/accounts`, `/_allauth` → backend:8000
+- `/api`, `/accounts`, `/_allauth` → backend:8001
 - All other paths → frontend:5173
+
+**Routing Architecture:**
+The ID service frontend is served under the `/id/` path prefix in both development and production:
+- Traefik receives `/id/*` requests and forwards them to the frontend (no path stripping)
+- Vite is configured with `base: '/id/'` so all asset paths are relative to `/id/`
+- React Router is configured with `basename: '/id'` so route matching works correctly
+- This ensures the frontend at `/id/` can access Vite assets and properly match React Router routes
+See `/id/frontend/CLAUDE.md` for details on the React Router basename configuration.
 
 ## Architectural Direction: Pure JWT
 
