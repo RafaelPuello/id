@@ -56,7 +56,12 @@ services:
       - "traefik.http.routers.id-frontend.tls=true"
       - "traefik.http.routers.id-frontend.tls.certresolver=le"
       - "traefik.http.routers.id-frontend.priority=10"
+      - "traefik.http.routers.id-frontend.middlewares=id-slash-redirect"
       - "traefik.http.services.id-frontend.loadbalancer.server.port=8080"
+      # Redirect /id (no trailing slash) → /id/
+      - "traefik.http.middlewares.id-slash-redirect.redirectregex.regex=^(https?://[^/]+)/id$$"
+      - "traefik.http.middlewares.id-slash-redirect.redirectregex.replacement=$${1}/id/"
+      - "traefik.http.middlewares.id-slash-redirect.redirectregex.permanent=true"
 
 networks:
   digidex-net:

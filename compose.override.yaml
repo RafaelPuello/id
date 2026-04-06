@@ -33,7 +33,12 @@ services:
       - "traefik.http.routers.id-frontend.entrypoints=web"
       - "traefik.http.routers.id-frontend.tls=false"
       - "traefik.http.routers.id-frontend.priority=10"
+      - "traefik.http.routers.id-frontend.middlewares=id-slash-redirect"
       - "traefik.http.services.id-frontend.loadbalancer.server.port=5173"
+      # Redirect /id (no trailing slash) → /id/
+      - "traefik.http.middlewares.id-slash-redirect.redirectregex.regex=^(https?://[^/]+)/id$$"
+      - "traefik.http.middlewares.id-slash-redirect.redirectregex.replacement=$${1}/id/"
+      - "traefik.http.middlewares.id-slash-redirect.redirectregex.permanent=true"
     env_file:
       - ./frontend/.env
     environment:
