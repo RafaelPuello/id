@@ -1,4 +1,4 @@
-name: identification-service
+name: id-service
 
 secrets:
   jwt_private_key:

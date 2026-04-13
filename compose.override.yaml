@@ -1,4 +1,4 @@
-name: identification-service
+name: id-service
 
 services:
   id-backend:
