@@ -30,7 +30,7 @@ services:
       - digidex-net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.id-backend.rule=Host(`digidex.bio`) && (PathPrefix(`/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
+      - "traefik.http.routers.id-backend.rule=Host(`digidex.bio`) && (PathPrefix(`/id/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
       - "traefik.http.routers.id-backend.entrypoints=websecure"
       - "traefik.http.routers.id-backend.tls=true"
       - "traefik.http.routers.id-backend.priority=1000"
