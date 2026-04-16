@@ -9,7 +9,7 @@ services:
     ports:
       - "8001:8001"
     labels:
-      - "traefik.http.routers.id-backend.rule=Host(`digidex.lan`) && (PathPrefix(`/id/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
+      - "traefik.http.routers.id-backend.rule=Host(`10.0.0.218`) && (PathPrefix(`/id/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
       - "traefik.http.routers.id-backend.entrypoints=web"
       - "traefik.http.routers.id-backend.tls=false"
       - "traefik.http.routers.id-backend.tls.certresolver="
@@ -30,7 +30,7 @@ services:
       - "5173:5173"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.id-frontend.rule=Host(`digidex.lan`) && PathPrefix(`/id`)"
+      - "traefik.http.routers.id-frontend.rule=Host(`10.0.0.218`) && PathPrefix(`/id`)"
       - "traefik.http.routers.id-frontend.entrypoints=web"
       - "traefik.http.routers.id-frontend.tls=false"
       - "traefik.http.routers.id-frontend.tls.certresolver="
