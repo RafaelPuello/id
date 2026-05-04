@@ -1,0 +1,75 @@
+# ID service — staging environment override
+# Builds prod targets; HTTP only on digidex-staging-net; routes on port 10001.
+
+name: id-service
+
+secrets:
+  jwt_private_key:
+    file: ../secrets/private_key.pem
+  jwt_public_key:
+    file: ../secrets/public_key.pem
+
+services:
+  id-backend:
+    container_name: id-backend-staging
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+      target: prod
+    restart: unless-stopped
+    secrets:
+      - source: jwt_private_key
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: jwt_public_key
+        uid: "1000"
+        gid: "1000"
+        mode: 0444
+    environment:
+      - JWT_PRIVATE_KEY_PATH=/run/secrets/jwt_private_key
+      - JWT_PUBLIC_KEY_PATH=/run/secrets/jwt_public_key
+    networks:
+      - digidex-staging-net
+    env_file:
+      - path: ./backend/.env.staging
+        required: true   # Copy from .env.staging.example before first deploy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.id-backend-staging.rule=Host(`10.0.0.218`) && (PathPrefix(`/id/api`) || PathPrefix(`/accounts`) || PathPrefix(`/_allauth`))"
+      - "traefik.http.routers.id-backend-staging.entrypoints=web"
+      - "traefik.http.routers.id-backend-staging.tls=false"
+      - "traefik.http.routers.id-backend-staging.tls.certresolver="
+      - "traefik.http.routers.id-backend-staging.priority=1000"
+      - "traefik.http.services.id-backend-staging.loadbalancer.server.port=8001"
+      - "traefik.docker.network=digidex-staging-net"
+
+  id-frontend:
+    container_name: id-frontend-staging
+    build:
+      context: ../
+      dockerfile: id/frontend/Dockerfile
+      target: prod
+    restart: unless-stopped
+    networks:
+      - digidex-staging-net
+    depends_on:
+      - id-backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.id-frontend-staging.rule=Host(`10.0.0.218`) && PathPrefix(`/id`)"
+      - "traefik.http.routers.id-frontend-staging.entrypoints=web"
+      - "traefik.http.routers.id-frontend-staging.tls=false"
+      - "traefik.http.routers.id-frontend-staging.tls.certresolver="
+      - "traefik.http.routers.id-frontend-staging.priority=10"
+      - "traefik.http.routers.id-frontend-staging.middlewares=id-slash-redirect-staging"
+      - "traefik.http.services.id-frontend-staging.loadbalancer.server.port=8080"
+      - "traefik.docker.network=digidex-staging-net"
+      # Redirect /id (no trailing slash) → /id/
+      - "traefik.http.middlewares.id-slash-redirect-staging.redirectregex.regex=^(https?://[^/]+)/id$$"
+      - "traefik.http.middlewares.id-slash-redirect-staging.redirectregex.replacement=$${1}/id/"
+      - "traefik.http.middlewares.id-slash-redirect-staging.redirectregex.permanent=true"
+
+networks:
+  digidex-staging-net:
+    external: true
