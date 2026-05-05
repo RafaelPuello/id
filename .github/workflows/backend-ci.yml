@@ -4,12 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'id/backend/**'
+      - 'backend/**'
       - '.github/workflows/backend-ci.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'id/backend/**'
+      - 'backend/**'
       - '.github/workflows/backend-ci.yml'
 
 jobs:
@@ -31,22 +31,22 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: 'id/backend/requirements*.txt'
+          cache-dependency-path: 'backend/requirements*.txt'
 
       - name: Install dependencies
-        working-directory: id/backend
+        working-directory: backend
         run: pip install -r requirements.txt -r requirements-dev.txt ruff
 
       - name: Lint
-        working-directory: id/backend
+        working-directory: backend
         run: ruff check .
 
       - name: Format check
-        working-directory: id/backend
+        working-directory: backend
         run: ruff format --check .
 
       - name: Test
-        working-directory: id/backend
+        working-directory: backend
         # settings_test.py inherits from settings.py which requires DJANGO_SECRET_KEY.
         # DATABASE_URL is set to SQLite as fallback; settings_test.py overrides
         # DATABASES to :memory: SQLite regardless.

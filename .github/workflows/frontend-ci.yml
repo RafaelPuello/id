@@ -4,12 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'id/frontend/**'
+      - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'id/frontend/**'
+      - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
 
 jobs:
@@ -31,20 +31,20 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          cache-dependency-path: 'id/frontend/package-lock.json'
+          cache-dependency-path: 'frontend/package-lock.json'
 
       - name: Install dependencies
-        working-directory: id/frontend
+        working-directory: frontend
         run: npm ci
 
       - name: Lint
-        working-directory: id/frontend
+        working-directory: frontend
         run: npm run lint
 
       - name: Unit tests
-        working-directory: id/frontend
+        working-directory: frontend
         run: npm test -- --passWithNoTests --ci
 
       - name: Build
-        working-directory: id/frontend
+        working-directory: frontend
         run: npm run build
