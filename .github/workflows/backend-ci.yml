@@ -1,0 +1,58 @@
+name: ID Backend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'id/backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'id/backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  id-backend:
+    name: ID Backend (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ['3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: 'id/backend/requirements*.txt'
+
+      - name: Install dependencies
+        working-directory: id/backend
+        run: pip install -r requirements.txt -r requirements-dev.txt ruff
+
+      - name: Lint
+        working-directory: id/backend
+        run: ruff check .
+
+      - name: Format check
+        working-directory: id/backend
+        run: ruff format --check .
+
+      - name: Test
+        working-directory: id/backend
+        # settings_test.py inherits from settings.py which requires DJANGO_SECRET_KEY.
+        # DATABASE_URL is set to SQLite as fallback; settings_test.py overrides
+        # DATABASES to :memory: SQLite regardless.
+        # DJANGO_SETTINGS_MODULE is set explicitly so no local .env.dev can override it.
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings_test
+          DJANGO_SECRET_KEY: ci-test-secret-key-not-for-production
+          DATABASE_URL: sqlite:///ci-test.db
+        run: pytest . --tb=short -q
