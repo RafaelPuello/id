@@ -1,107 +1,47 @@
 # CLAUDE.md - DigiDex ID Service
 
-**Service-specific guides:**
-- **Backend**: See `/id/backend/CLAUDE.md` for detailed Django backend architecture, JWT setup, testing, and API details
-- **Frontend**: See `/id/frontend/CLAUDE.md` for React/Vite frontend architecture and component details
+Authentication/identity microservice: user accounts, MFA, OAuth, WebAuthn/passkeys via Django-allauth (headless) + React/Vite frontend.
 
-This file provides overall service context.
+**Detailed guides:**
+- **Backend**: See `/id/backend/CLAUDE.md` for Django architecture, JWT (RS256), authentication flow
+- **Frontend**: See `/id/frontend/CLAUDE.md` for React/Vite SPA, AuthContext, routing, components
 
-## Project Overview
+## Quick Setup
 
-DigiDex ID Service is the identity/authentication microservice for the DigiDex platform. It provides user account management with multi-factor authentication (MFA), social account providers (OAuth), and passwordless authentication via WebAuthn/passkeys. The service uses a headless django-allauth backend with a React SPA frontend.
+Backend: `cd backend && pip install -r requirements.txt -r requirements-dev.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8001`
 
-Production URL: https://id.digidex.bio
+Frontend: `cd frontend && npm install && npm run dev`
 
-## Commands
+Docker: `docker compose -f compose.yaml -f compose.override.yaml up` (includes mailcatcher at localhost:1080)
 
-### Frontend (React/Vite)
-```bash
-cd frontend
-npm install
-npm run dev              # Development server on port 5173
-npm run build           # Production build to dist/
-npm run lint            # ESLint
-npm test                # Run Jest unit tests
-npm run test:watch      # Jest watch mode
-npm run test:coverage   # Jest with coverage report
-npm run test:e2e        # Playwright E2E tests
-npm run test:e2e:ui     # Playwright E2E tests (UI mode)
-npm run test:e2e:debug  # Playwright E2E tests (debug mode)
-```
+See README.md for full setup and command reference.
 
-### Backend (Django)
-```bash
-cd backend
-pip install -r requirements.txt -r requirements-dev.txt
-python manage.py migrate
-python manage.py runserver 0.0.0.0:8000
-pytest                  # Run all tests
-pytest identity/        # Run tests for identity app
-pytest -v --cov         # With coverage report
-```
+## Architecture
 
-### Docker Compose
-```bash
-# Development (with hot reloading)
-docker compose -f compose.yaml -f compose.override.yaml up
+- **Backend**: Django 6.0 + django-allauth headless API (no sessions); JWT (RS256); email-based User model; MFA (TOTP/WebAuthn)
+- **Frontend**: React 19 + Vite 7 SPA; AuthContext state management; React Router v7 with basename routing
+- **Auth flow**: Frontend calls `/_allauth/browser/v1/*` endpoints; receives JWT tokens; stores in localStorage; sends in Authorization header
+- **Routing**: Traefik forwards `/id/*` without stripping; Vite `base: '/id/'`; React Router `basename: '/id'`
+- **Network**: Both on `digidex-net` external Docker network (Traefik discovery)
 
-# Production
-docker compose -f compose.yaml up
-```
+## Conventions
 
-Development includes a mailcatcher service at `localhost:1080` for email testing.
+- API: Headless django-allauth endpoints (not traditional session-based)
+- Frontend: Pure JWT client; localStorage token persistence; localStorage-based cross-tab logout detection
+- Auth state: Discriminated union type (loading | authenticated | unauthenticated)
+- Shared styling: `src/styles` symlinks to `/shared/styles`
 
-## Architecture Overview
+## Gotchas
 
-**Backend**: Django 6.0 with django-allauth headless API, JWT-based authentication (RS256), custom email-based User model, MFA support (TOTP/WebAuthn/recovery codes). See `/id/backend/CLAUDE.md` for detailed configuration, API endpoints, and authentication flow.
+- **Port 8001**: Non-standard Django port. Don't confuse with CMS (8000) or App (8000).
+- **Sessions vs JWT**: Currently uses Django sessions for django-allauth refresh token validation (interim solution). Future direction: eliminate sessions entirely.
+- **Traefik path forwarding**: Routes `/id/*` WITHOUT stripping. Vite and React Router must handle full path themselves.
+- **Runtime config**: Frontend fetches app config from `/_allauth/app/v1/config` at runtime, not build-time env vars.
+- **Styles submodule**: Frontend imports from git submodule (`src/styles` → `/shared/styles`). If missing, initialize with `git submodule update --init --recursive`.
 
-**Frontend**: React 19 + Vite 7 SPA with AuthContext for state management, React Router v7 for routing, and direct integration with headless allauth API. See `/id/frontend/CLAUDE.md` for component organization, route guards, and auth hooks.
+## Key Files
 
-## Backend Integration
-
-The frontend uses relative paths and expects to run behind a reverse proxy (Traefik) with the backend at the same origin. In development, Traefik routes:
-- `/api`, `/accounts`, `/_allauth` → backend:8001
-- All other paths → frontend:5173
-
-**Routing Architecture:**
-The ID service frontend is served under the `/id/` path prefix in both development and production:
-- Traefik receives `/id/*` requests and forwards them to the frontend (no path stripping)
-- Vite is configured with `base: '/id/'` so all asset paths are relative to `/id/`
-- React Router is configured with `basename: '/id'` so route matching works correctly
-- This ensures the frontend at `/id/` can access Vite assets and properly match React Router routes
-See `/id/frontend/CLAUDE.md` for details on the React Router basename configuration.
-
-## Architectural Direction: Pure JWT
-
-The ID service is moving towards pure stateless JWT authentication with **no Django sessions**. The current database-backed session engine is a necessary interim solution (required by django-allauth's refresh token validation). Future auth work should aim to eliminate sessions entirely. The frontend is already designed as a pure JWT client and requires no changes for this migration. See `/id/backend/CLAUDE.md` for details on the blocker and potential paths forward.
-
-## Environment Setup
-
-### Backend
-```bash
-cd backend
-# Required environment variables (see .env.dev or .env.prod):
-# - DJANGO_SECRET_KEY: Secret key for Django
-# - DATABASE_URL: PostgreSQL connection string
-# - DJANGO_DEBUG: Set to "True" for development
-# - DJANGO_ALLOWED_HOSTS: Comma-separated list of allowed hosts
-
-# Setup:
-python manage.py migrate           # Create database tables
-python manage.py runserver 0.0.0.0:8000
-```
-
-### Frontend
-- Runtime config fetched from backend (`/_allauth/app/v1/config`), not build-time env vars
-- Frontend expects backend at same origin (via Traefik reverse proxy in development)
-- `.env` file optional; most config comes from backend at runtime
-
-### Styles (Git Submodule)
-Frontend imports SCSS from a git submodule:
-```bash
-# The submodule is auto-initialized with typical git clone
-# If styles are missing, initialize explicitly:
-git submodule update --init --recursive
-
-# Frontend then imports styles via symlink: src/styles → /shared/styles
-```
+- Backend config: `id/backend/config/settings.py`, `id/backend/config/keys/jwt_public_key.pem` (distributed via Docker secret/bind mount)
+- Backend API: `id/backend/identity/models.py` (CustomUser), `id/backend/config/urls.py` (allauth endpoints)
+- Frontend auth: `id/frontend/src/auth/AuthContext.jsx` (state machine), `id/frontend/src/hooks/useAuth.jsx`
+- Frontend routing: `id/frontend/src/App.jsx` (basename: '/id'), route guards
