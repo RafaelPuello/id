@@ -21,7 +21,7 @@ See README.md for full setup and command reference.
 - **Backend**: Django 6.0 + django-allauth headless API (no sessions); JWT (RS256); email-based User model; MFA (TOTP/WebAuthn)
 - **Frontend**: React 19 + Vite 7 SPA; AuthContext state management; React Router v7 with basename routing
 - **Auth flow**: Frontend calls `/_allauth/browser/v1/*` endpoints; receives JWT tokens; stores in localStorage; sends in Authorization header
-- **Routing**: Traefik forwards `/id/*` without stripping; Vite `base: '/id/'`; React Router `basename: '/id'`
+- **Routing**: Traefik forwards `/id/*` without stripping (see `.claude/rules/traefik-path-handling.md`); Vite `base: '/id/'`; React Router `basename: '/id'`
 - **Network**: Both on `digidex-net` external Docker network (Traefik discovery)
 
 ## Conventions
